@@ -24,6 +24,18 @@ namespace Collections.Models
                 return aulas.Sum(aula => aula.Duracao);
             } 
         }
+
+        // dicionario de alunos
+
+        private IDictionary<int, Aluno> dicionarioAlunos = new Dictionary<int, Aluno>();
+
+        private ISet<Aluno> alunos = new HashSet<Aluno>();
+
+        public IList<Aluno> Alunos
+        {
+            get { return new ReadOnlyCollection<Aluno>(alunos.ToList<Aluno>()); }
+        }
+
         private IList<Aula> aulas;
 
         public IList<Aula> Aulas
@@ -73,9 +85,27 @@ namespace Collections.Models
             this.aulas.Add(aula);
         }
 
+        internal void Matricula(Aluno aluno)
+        {
+            alunos.Add(aluno); 
+            this.dicionarioAlunos.Add(aluno.NumeroMatricula, aluno); // somente adiciona, nao substitui (estoura erro se tiver um igual), para substituir use this.dicionarioAlunos[numeroMatricula] = aluno
+        }
+
+        public Boolean EstaMatriculado(Aluno aluno)
+        {
+            return alunos.Contains(aluno);
+        }
+
+        internal Aluno BuscaMatricula(int numeroMatricula)
+        {
+            //return dicionarioAlunos[numeroMatricula];
+            this.dicionarioAlunos.TryGetValue(numeroMatricula, out Aluno aluno);
+            return aluno;
+        }
+
         public override string ToString()
         {
-            return $"Curso de nome {nome} com instrutor(a) {instrutor} e com cursos {LoggerString(aulas)} e contem uma duracao total de {TotalDuracao} minutos";
+            return $"Curso de nome {nome} com instrutor(a) {instrutor} e com cursos {LoggerString(aulas)} e contem uma duracao total de {TotalDuracao} minutos e contem um total de {alunos.Count()} alunos matriculados";
         }
 
     }
